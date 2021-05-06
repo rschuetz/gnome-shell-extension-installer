@@ -11,6 +11,8 @@
    #                                                               #
    #################################################################
 
+CFG_FILE=$HOME/.local/share/gnome-shell/gnome-shell-extension-installer.selected_versions
+
 usage_guide() {
   cat << EOF
 Usage: $SCRIPT_NAME EXTENSION_ID [EXTENSION_ID...] [GNOME_VERSION] [OPTIONS]
@@ -122,6 +124,18 @@ check_version_availability() {
 
 select_version() {
   if [[ "${EXTENSION_VERSIONS[0]}" ]]; then
+
+    [[ ! -s $CFG_FILE ]] && echo "{}" >$CFG_FILE
+    PREV_SELECTED=$( jq -r ".[\"$EXTENSION_UUID\"].selected" < $CFG_FILE )
+    PREV_EXTENSION_VERSIONS=$( jq -r ".[\"$EXTENSION_UUID\"].available" < $CFG_FILE )
+    PREV_GNOME_VERSION=$( jq -r ".[\"$EXTENSION_UUID\"].gnome_version" < $CFG_FILE )
+
+    if [[ $PREV_EXTENSION_VERSIONS = ${EXTENSION_VERSIONS[*]} && $PREV_GNOME_VERSION = $GNOME_VERSION ]]; then
+      SELECTED_VERSION=$PREV_SELECTED
+      echo "Auto-selected: $SELECTED_VERSION"
+      return
+    fi
+
     while [[ ! $SELECTED_VERSION ]]; do
       echo -n $1"Type a version to $INSTALL: "
       if [[ ! $SKIP_PROMPTS ]]; then
@@ -135,6 +149,12 @@ select_version() {
         SELECTED_VERSION="${EXTENSION_VERSIONS[0]}"
       fi
     done
+
+    cat $CFG_FILE | \
+    jq ".[\"$EXTENSION_UUID\"] += {\"selected\": \"$SELECTED_VERSION\"}" | \
+    jq ".[\"$EXTENSION_UUID\"] += {\"available\": \"${EXTENSION_VERSIONS[*]}\"}" | \
+    jq ".[\"$EXTENSION_UUID\"] += {\"gnome_version\": \"$GNOME_VERSION\"}" | \
+    sponge $CFG_FILE
   else
     echo $1"No version available"
   fi
