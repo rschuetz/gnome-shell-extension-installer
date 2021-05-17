@@ -606,8 +606,8 @@ else
   usage_guide
 fi
 
-[[ ${#INSTALLED[@]} -gt 0 ]] && echo -n "${#INSTALLED[@]} new extension(s) installed. "
-[[ ${#UPDATED[@]} -gt 0 ]] && echo -n "${#UPDATED[@]} extension(s) updated. "
+[[ ${#INSTALLED[@]} -gt 0 ]] && echo "${#INSTALLED[@]} new extension(s) installed: ${INSTALLED[*]}"
+[[ ${#UPDATED[@]} -gt 0 ]] && echo "${#UPDATED[@]} extension(s) updated: ${UPDATED[*]}"
 if [[ ${#INSTALLED[@]} -gt 0 ]] || [[ ${#UPDATED[@]} -gt 0 ]]; then
   if [[ $RESTART == 1 ]]; then
     restart_shell
