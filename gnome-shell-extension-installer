@@ -588,7 +588,7 @@ elif [[ $UPDATE_MODE ]]; then
       esac
     else
       echo "[$EXTENSION] Searching extensions.gnome.org"
-      download_info "/extension-query/?search=${EXTENSION}" \
+      download_info "/extension-query/?uuid=${EXTENSION}" \
                     "Extension not found" \
                     "The search page for \"$SEARCH_STRING\"" \
                     "Failed to obtain extension info" &&
