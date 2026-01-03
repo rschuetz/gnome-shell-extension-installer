@@ -112,6 +112,11 @@ check_version_availability() {
     SELECTED_VERSION="$1"
   done
   [[ ! $SELECTED_VERSION ]] &&
+  for VERSION in ${EXTENSION_VERSIONS[@]}; do
+    [ "${1%%.*}" == "$VERSION" ] &&
+    SELECTED_VERSION="${1%%.*}"
+  done
+  [[ ! $SELECTED_VERSION ]] &&
   { TARGET=$( sed -n "s/^3\.\([0-9]\+\).*$/\1/p" <<< "$1" )
     LATEST=$( sed -n "s/^3\.\([0-9]\+\).*$/\1/p" <<< "${EXTENSION_VERSIONS[0]}" )
     [[ ${1%%\.*} == ${EXTENSION_VERSIONS[0]%%\.*} ]] &&
@@ -132,7 +137,7 @@ select_version() {
 
     if [[ $PREV_EXTENSION_VERSIONS = ${EXTENSION_VERSIONS[*]} && $PREV_GNOME_VERSION = $GNOME_VERSION ]]; then
       SELECTED_VERSION=$PREV_SELECTED
-      echo "Auto-selected: $SELECTED_VERSION"
+      echo "Auto-selected based on previous selection: $SELECTED_VERSION"
       return
     fi
 
